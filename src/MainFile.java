@@ -22,21 +22,23 @@ public class MainFile{
         for (String str : patternstr){
             patternint.add(Double.parseDouble(str));
         }
-        MainFile.printList(patternint);
+        // MainFile.printList(patternint);
 
         String[] problemstr = input2.split(" ");
         List<String> problem = new ArrayList<>();
         for (String str : problemstr){
             problem.add(str);
         }
-        MainFile.printList(problem);
+        // MainFile.printList(problem);
 
         FiguralPuzzleSolver<Double> fps = new FiguralPuzzleSolver<>(patternint, problem);
         fps.solve();
 
         int k = 0;
         for (ProbableAnswer p : fps.finalresult){
-            System.out.println("Urutan " + (k + 1) + " : " + p.problemseq.toString());
+            k++;
+            System.out.println("\nHasil Pencocokan Pola");
+            System.out.println("Urutan " + k + " : " + p.problemseq.toString());
             System.out.println("Operasi : " + p.operator.toString());
             System.out.println("Hasil : " + p.value);
         }
@@ -97,20 +99,12 @@ class FiguralPuzzleSolver<T extends Number>{
         this.pattern.remove(targetidx);
 
         permute(this.pattern, 0, this.pattern.size() - 1);
-        System.out.println(this.patpermute.toString());
-        System.out.println("-----------------\n");
-
-        for (List<String> lstr : this.oprtpermute){
+        for (int i = 0; i < this.oprtpermute.size(); i++){
             for (List<T> lint : this.patpermute){
-                this.applypatternoperator(lint, lstr);
+                this.applypatternoperator(lint, this.oprtpermute.get(i)); 
             }
         }
-        System.out.println(this.eligiblepattern.toString());
         this.listofsequence = this.permutesequence();
-        System.out.println(this.listofsequence.toString());
-
-        System.out.println("-----------------\n");
-
         this.problem.remove(targetidx);
 
         // Konversi problem list menjadi tipe double
@@ -205,8 +199,6 @@ class FiguralPuzzleSolver<T extends Number>{
                 case "/":
                     result = result / pat.get(n).doubleValue();
                     break;
-                default:
-                    break;
             }
         }
         if (result == this.ptrtarget.doubleValue()){
@@ -249,14 +241,14 @@ class FiguralPuzzleSolver<T extends Number>{
         for (String op : this.operatorlist){
             temp = new ArrayList<>(list);
             temp.set(temp.size() - 1, op);
-            // System.out.println(temp.toString());
             this.oprtpermute.add(temp);
         }
         if (isAllSlash(temp)){
             return;
         }
-        temp = leftcheck(temp, temp.size() - 1);
-        this.oprecursive(temp);
+        List<String> temp2 = new ArrayList<>(temp);
+        temp2 = leftcheck(temp2, temp2.size() - 1);
+        this.oprecursive(temp2);
     }
     private boolean isAllSlash(List<String> list){
         boolean valid = true;
@@ -266,7 +258,6 @@ class FiguralPuzzleSolver<T extends Number>{
         return valid;
     }
     private List<String> leftcheck(List<String> l, int idx){
-        // System.out.println(idx);
         if (l.get(idx).equals("/") && idx != 0){
             leftcheck(l, idx - 1);
             l.set(idx, this.operatorlist.get(0)); // kolom ini jadi plus lagi
